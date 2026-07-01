@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Ecosystem URL Capture</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0e0e14;
+      color: #c8c8e0;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      line-height: 1.7;
+    }
+    .doc {
+      width: 100%;
+      max-width: 760px;
+      background: #15151f;
+      border: 1px solid #1e1e2e;
+      border-radius: 12px;
+      padding: 44px 40px;
+    }
+    h1 { font-size: 22px; color: #a0a8ff; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .updated { font-size: 12px; color: #5a5a7a; margin-bottom: 28px; letter-spacing: 0.05em; }
+    h2 {
+      font-size: 15px; color: #c8c8ff; letter-spacing: 0.03em;
+      margin: 28px 0 10px; padding-top: 18px; border-top: 1px solid #1e1e2e;
+    }
+    p, li { font-size: 13.5px; color: #9a9ac0; margin-bottom: 10px; }
+    ul { margin: 0 0 10px 22px; }
+    li { margin-bottom: 6px; }
+    b, strong { color: #c8c8ff; }
+    code {
+      background: #101019; border: 1px solid #1e1e2e; border-radius: 4px;
+      padding: 1px 6px; font-size: 12.5px; color: #a0a8ff;
+    }
+    a { color: #5b6af0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 34px; padding-top: 18px; border-top: 1px solid #1e1e2e;
+      font-size: 11px; color: #5a5a7a; letter-spacing: 0.05em; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="doc">
+    <h1>Privacy Policy</h1>
+    <div class="updated">ECOSYSTEM URL CAPTURE &nbsp;·&nbsp; Last updated: June 30, 2026</div>
+
+    <p>
+      This Privacy Policy explains what data the <b>Ecosystem URL Capture</b> Chrome
+      extension ("the extension") collects, why, and how it is handled. The extension
+      is a collaboration tool that lets authorized members file webpage URLs into shared,
+      themed collections held in a hosted database.
+    </p>
+
+    <h2>1. What the extension is for</h2>
+    <p>
+      <b>Single purpose:</b> when you click the extension on a browser tab and choose one
+      or more collections, the extension records that page's URL into those collections so
+      that members of an ecosystem can aggregate startups and websites by theme. The
+      extension does nothing in the background and does not act on tabs you do not
+      explicitly capture.
+    </p>
+
+    <h2>2. Data we collect</h2>
+    <p>We collect data only when you are signed in and only at the moment you click <b>Capture</b>:</p>
+    <ul>
+      <li><b>Page URL</b> of the active tab you choose to capture (this is "web history" — but only for pages you deliberately submit, never your browsing in general).</li>
+      <li><b>Page metadata</b> you submit alongside it: the page title and the original (uncleaned) URL.</li>
+      <li><b>Your account identity</b>: the email address you log in with, used to attribute each capture and to enforce which collections you may write to.</li>
+      <li><b>IP address</b> of the request, recorded server-side at capture time.</li>
+      <li><b>Browser user agent</b> string, recorded server-side at capture time.</li>
+      <li><b>Timestamp</b> of the capture.</li>
+    </ul>
+    <p>
+      We do <b>not</b> collect your general browsing history, keystrokes, form contents,
+      page contents, cookies, or any data from tabs you do not explicitly capture.
+    </p>
+
+    <h2>3. How data is stored</h2>
+    <p>
+      Captured data and account information are stored in a hosted
+      <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a>
+      (PostgreSQL) database operated for this project. Your login session token is stored
+      locally in your browser via the Chrome <code>storage</code> API solely to keep you
+      signed in; it is not transmitted to anyone other than the Supabase authentication
+      service.
+    </p>
+
+    <h2>4. How data is used</h2>
+    <ul>
+      <li>To file the URLs you submit into the collections you select.</li>
+      <li>To attribute each capture to its contributor and show recent activity.</li>
+      <li>To enforce access control (which collections each member may read or write).</li>
+      <li>To deduplicate URLs and maintain data quality.</li>
+    </ul>
+    <p>
+      We do <b>not</b> sell your data, share it with advertisers, or use it for any purpose
+      unrelated to the collaborative collection feature described here.
+    </p>
+
+    <h2>5. Who can see your captures</h2>
+    <p>
+      Access is role-based. Captures in a collection are visible to administrators and to
+      members granted access to that collection. Your contributor email is visible to
+      administrators and is stored with each capture you make.
+    </p>
+
+    <h2>6. Permissions the extension requests</h2>
+    <ul>
+      <li><code>activeTab</code> — to read the URL of the current tab when you click Capture.</li>
+      <li><code>storage</code> — to keep your login session on your device.</li>
+      <li><code>host_permissions: https://*.supabase.co/*</code> — to send captures to, and authenticate with, the Supabase backend.</li>
+    </ul>
+
+    <h2>7. Data retention &amp; deletion</h2>
+    <p>
+      Captures persist until removed by an administrator. To request deletion of your
+      account or of captures attributed to you, contact us at the address below and we will
+      action the request.
+    </p>
+
+    <h2>8. Third parties</h2>
+    <p>
+      The only third-party processor is Supabase, which hosts the database and
+      authentication service. No other third parties receive your data. Review Supabase's
+      own privacy terms at
+      <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>.
+    </p>
+
+    <h2>9. Changes to this policy</h2>
+    <p>
+      We may update this policy as the extension evolves. Material changes will be reflected
+      by the "Last updated" date at the top of this page.
+    </p>
+
+    <h2>10. Contact</h2>
+    <p>
+      Questions or data requests: <a href="mailto:walter@datmap.ai">walter@datmap.ai</a>.
+    </p>
+
+    <div class="footer">ECOSYSTEM URL CAPTURE — PRIVACY POLICY</div>
+  </div>
+</body>
+</html>

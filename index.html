@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ecosystem URL Capture</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0e0e14;
+      color: #e0e0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: #15151f;
+      border: 1px solid #1e1e2e;
+      border-radius: 12px;
+      padding: 36px 32px;
+      text-align: center;
+    }
+    .badge {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      background: rgba(91, 106, 240, 0.15);
+      box-shadow: 0 0 24px rgba(91, 106, 240, 0.35);
+    }
+    .badge.ok  { background: rgba(34, 197, 94, 0.15);  box-shadow: 0 0 24px rgba(34,197,94,0.3); }
+    .badge.err { background: rgba(239, 68, 68, 0.15);  box-shadow: 0 0 24px rgba(239,68,68,0.3); }
+    h1 { font-size: 18px; letter-spacing: 0.04em; color: #a0a8ff; margin-bottom: 12px; }
+    p  { font-size: 13px; line-height: 1.7; color: #9a9ac0; margin-bottom: 10px; }
+    .steps {
+      text-align: left; font-size: 12.5px; line-height: 1.8; color: #8a8ab0;
+      background: #101019; border: 1px solid #1e1e2e; border-radius: 8px;
+      padding: 14px 16px; margin-top: 18px;
+    }
+    .steps b { color: #c8c8ff; }
+    .footer { margin-top: 22px; font-size: 11px; color: #5a5a7a; letter-spacing: 0.05em; }
+    .footer a { color: #7a7ab0; text-decoration: none; }
+    .footer a:hover { color: #a0a8ff; text-decoration: underline; }
+
+    /* Chrome Web Store CTA */
+    .storebtn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 18px; padding: 12px 20px; width: 100%;
+      background: #5b6af0; color: #fff; font-family: inherit; font-size: 13px;
+      font-weight: bold; letter-spacing: 0.05em; text-decoration: none;
+      border-radius: 6px; transition: background 0.15s;
+    }
+    .storebtn:hover { background: #4a59df; }
+
+    /* password form */
+    form { margin-top: 18px; text-align: left; }
+    label { display: block; font-size: 10px; color: #6a6a90; margin: 0 0 4px 2px; letter-spacing: 0.05em; }
+    input {
+      width: 100%; background: #101019; border: 1px solid #1e1e2e; border-radius: 6px;
+      padding: 10px 12px; color: #e0e0f0; font-family: inherit; font-size: 13px;
+      outline: none; margin-bottom: 12px;
+    }
+    input:focus { border-color: #5b6af0; }
+    button {
+      width: 100%; padding: 12px; background: #5b6af0; border: none; border-radius: 6px;
+      color: #fff; font-family: inherit; font-size: 13px; font-weight: bold;
+      letter-spacing: 0.05em; cursor: pointer; transition: background 0.15s;
+    }
+    button:hover { background: #4a59df; }
+    button:disabled { background: #2a2a3e; color: #5a5a7a; cursor: not-allowed; }
+    .formstatus { margin-top: 12px; font-size: 12px; text-align: center; min-height: 16px; }
+    .formstatus.ok  { color: #22c55e; }
+    .formstatus.err { color: #ef4444; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge ok" id="badge">✓</div>
+    <h1 id="title">EMAIL CONFIRMED</h1>
+    <p id="message">Your account is verified. You can now use the extension.</p>
+
+    <a class="storebtn" id="storebtn"
+       href="https://chromewebstore.google.com/detail/ecosystem-url-capture/ijhopdbbcjldpcdjfpiiofhhcolegiii"
+       target="_blank" rel="noopener">＋ Add to Chrome</a>
+
+    <!-- Set-password form (shown for invite / recovery links) -->
+    <form id="pwform" class="hidden" autocomplete="off">
+      <label for="pw">NEW PASSWORD</label>
+      <input type="password" id="pw" placeholder="at least 8 characters" autocomplete="new-password" />
+      <label for="pw2">CONFIRM PASSWORD</label>
+      <input type="password" id="pw2" placeholder="repeat password" autocomplete="new-password" />
+      <button type="submit" id="pwbtn">SET PASSWORD</button>
+      <div class="formstatus" id="formstatus"></div>
+    </form>
+
+    <div class="steps" id="steps">
+      <b>Next steps</b><br />
+      1. Click the <b>Ecosystem URL Capture</b> icon in Chrome.<br />
+      2. Log in with your email and password.<br />
+      3. Pick one or more collections and capture the page.
+    </div>
+
+    <div class="footer">ECOSYSTEM URL CAPTURE &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a></div>
+  </div>
+
+  <script>
+    // Public Supabase config (same values that ship in the extension).
+    const SUPA = {
+      URL: "https://vsdziimleqdtcvdheyun.supabase.co",
+      KEY: "sb_publishable_gXKYiImrMP2L-jnfo5-5ZA_gUNHJ3eJ"
+    };
+
+    (function () {
+      const params = new URLSearchParams(
+        (location.hash ? location.hash.slice(1) : "") +
+        (location.search ? "&" + location.search.slice(1) : "")
+      );
+      const err   = params.get("error_description") || params.get("error");
+      const type  = params.get("type");
+      const token = params.get("access_token");
+
+      const badge = document.getElementById("badge");
+      const title = document.getElementById("title");
+      const msg   = document.getElementById("message");
+      const steps = document.getElementById("steps");
+      const form  = document.getElementById("pwform");
+
+      if (err) {
+        badge.textContent = "!";
+        badge.className = "badge err";
+        title.textContent = "LINK PROBLEM";
+        msg.textContent = decodeURIComponent(err).replace(/\+/g, " ") +
+          ". The link may have expired — ask an admin to resend your invite or reset your password.";
+        steps.classList.add("hidden");
+        return;
+      }
+
+      // Invite or recovery → let the user choose a password using the token.
+      if (token && (type === "invite" || type === "recovery")) {
+        title.textContent = type === "invite" ? "WELCOME — SET YOUR PASSWORD" : "RESET YOUR PASSWORD";
+        msg.textContent = "Choose a password for your account, then log in via the extension.";
+        steps.classList.add("hidden");
+        form.classList.remove("hidden");
+        wirePasswordForm(token);
+        return;
+      }
+
+      if (type === "invite") {
+        title.textContent = "INVITE ACCEPTED";
+        msg.textContent = "Your account is ready. Open the extension and log in.";
+      }
+    })();
+
+    function wirePasswordForm(accessToken) {
+      const form = document.getElementById("pwform");
+      const pw   = document.getElementById("pw");
+      const pw2  = document.getElementById("pw2");
+      const btn  = document.getElementById("pwbtn");
+      const stat = document.getElementById("formstatus");
+
+      function setStatus(t, cls) { stat.textContent = t; stat.className = "formstatus " + (cls || ""); }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (pw.value.length < 8) return setStatus("Password must be at least 8 characters.", "err");
+        if (pw.value !== pw2.value) return setStatus("Passwords do not match.", "err");
+
+        btn.disabled = true;
+        btn.textContent = "SAVING…";
+        setStatus("");
+
+        try {
+          const res = await fetch(`${SUPA.URL}/auth/v1/user`, {
+            method: "PUT",
+            headers: {
+              apikey: SUPA.KEY,
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ password: pw.value }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.msg || data.error_description || data.error || "Could not set password");
+
+          // Success.
+          document.getElementById("badge").className = "badge ok";
+          document.getElementById("title").textContent = "PASSWORD SET";
+          document.getElementById("message").textContent =
+            "All set. Open the Ecosystem URL Capture extension and log in with your email and new password.";
+          form.classList.add("hidden");
+          document.getElementById("steps").classList.remove("hidden");
+        } catch (e2) {
+          setStatus("✗ " + e2.message, "err");
+          btn.disabled = false;
+          btn.textContent = "SET PASSWORD";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

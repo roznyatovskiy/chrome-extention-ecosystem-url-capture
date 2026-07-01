@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 340px;
+      font-family: 'Courier New', monospace;
+      background: #0e0e14;
+      color: #e0e0f0;
+    }
+
+    .header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #1e1e2e;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #5b6af0;
+      box-shadow: 0 0 8px #5b6af0;
+    }
+    .title { font-size: 13px; font-weight: bold; letter-spacing: 0.06em; color: #a0a8ff; }
+    .spacer { flex: 1; }
+    .who { font-size: 10px; color: #6a6a90; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .linkbtn { background: none; border: none; color: #6a6a90; font-size: 10px; cursor: pointer; font-family: inherit; }
+    .linkbtn:hover { color: #a0a8ff; }
+
+    .body { padding: 14px 16px; }
+    .hidden { display: none !important; }
+
+    label.fld { display: block; font-size: 10px; color: #6a6a90; margin: 0 0 4px 2px; letter-spacing: 0.05em; }
+
+    input {
+      width: 100%;
+      background: #15151f;
+      border: 1px solid #1e1e2e;
+      border-radius: 6px;
+      padding: 9px 11px;
+      color: #e0e0f0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+    input:focus { border-color: #5b6af0; }
+    input::placeholder { color: #3a3a5a; }
+
+    .url-box {
+      background: #15151f;
+      border: 1px solid #1e1e2e;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 11px;
+      color: #7878a0;
+      word-break: break-all;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      min-height: 36px;
+    }
+
+    .section-label { font-size: 10px; color: #6a6a90; letter-spacing: 0.06em; margin: 4px 2px 6px; }
+
+    /* selected + suggestion chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 4px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 14px;
+      padding: 5px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      border: 1px solid #2e2e4e;
+      background: #15151f;
+      color: #9a9ac0;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: #5b6af0; color: #c8c8ff; }
+    .chip.selected { background: #5b6af0; border-color: #5b6af0; color: #fff; }
+    .chip .x { font-weight: bold; opacity: 0.8; }
+
+    .suggestions {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #1e1e2e;
+      border-radius: 6px;
+      background: #121219;
+      margin-bottom: 12px;
+    }
+    .sugg {
+      padding: 8px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #1a1a26;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .sugg:last-child { border-bottom: none; }
+    .sugg:hover { background: #1a1a2a; }
+    .sugg .theme { font-size: 10px; color: #5a5a7a; }
+    .sugg.checked { color: #8fa0ff; }
+    .sugg .tick { color: #5b6af0; font-weight: bold; }
+    .empty { padding: 10px 11px; font-size: 11px; color: #5a5a7a; text-align: center; }
+
+    button.primary {
+      width: 100%;
+      padding: 11px;
+      background: #5b6af0;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button.primary:hover { background: #4a59df; }
+    button.primary:disabled { background: #2a2a3e; color: #5a5a7a; cursor: not-allowed; }
+
+    #status, #login-status {
+      margin-top: 10px;
+      font-size: 11px;
+      text-align: center;
+      min-height: 16px;
+      line-height: 1.5;
+      display: none;
+      word-break: break-word;
+    }
+    .ok  { color: #22c55e; display: block !important; }
+    .err { color: #ef4444; display: block !important; }
+    .muted { color: #6a6a90; display: block !important; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="dot"></div>
+    <span class="title">URL → COLLECTIONS</span>
+    <div class="spacer"></div>
+    <span class="who hidden" id="who"></span>
+    <button class="linkbtn hidden" id="logout">logout</button>
+  </div>
+
+  <!-- LOGIN VIEW -->
+  <div class="body" id="login-view">
+    <label class="fld" for="email">EMAIL</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="username" />
+    <label class="fld" for="password">PASSWORD</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    <button class="primary" id="login-btn">LOG IN</button>
+    <div id="login-status"></div>
+  </div>
+
+  <!-- CAPTURE VIEW -->
+  <div class="body hidden" id="capture-view">
+    <div class="url-box" id="url-display">loading…</div>
+
+    <input type="text" id="search" placeholder="search collections…" autocomplete="off" />
+
+    <div class="section-label hidden" id="selected-label">SELECTED</div>
+    <div class="chips" id="selected-chips"></div>
+
+    <div class="section-label" id="list-label">RECENT</div>
+    <div class="suggestions" id="suggestions"></div>
+
+    <button class="primary" id="capture-btn" disabled>CAPTURE</button>
+    <div id="status"></div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="supabase.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
